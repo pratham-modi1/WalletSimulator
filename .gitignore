@@ -1,0 +1,94 @@
+# ==========================================
+# JAVA
+# ==========================================
+*.class
+hs_err_pid*
+replay_pid*
+
+# ==========================================
+# MAVEN
+# ==========================================
+**/target/
+**/pom.xml.tag
+**/pom.xml.releaseBackup
+**/pom.xml.versionsBackup
+**/pom.xml.next
+**/release.properties
+
+# ==========================================
+# GRADLE
+# ==========================================
+.gradle/
+**/build/
+
+# ==========================================
+# IDE CONFIGURATIONS
+# ==========================================
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+.metadata/
+
+# ==========================================
+# OS FILES
+# ==========================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==========================================
+# LOGS
+# ==========================================
+*.log
+logs/
+
+# ==========================================
+# ENVIRONMENT VARIABLES & SECRETS
+# ==========================================
+.env
+.env.*
+!.env.example
+!.env.template
+
+# ==========================================
+# SPRING BOOT CONFIGURATION
+# ==========================================
+**/src/main/resources/application.properties
+**/src/main/resources/application-local.properties
+**/src/main/resources/application-local.yml
+**/src/main/resources/application-dev.properties
+**/src/main/resources/application-dev.yml
+**/src/main/resources/application-prod.properties
+**/src/main/resources/application-prod.yml
+
+# ==========================================
+# DATABASE BACKUPS
+# ==========================================
+*.sql.gz
+*.dump
+*.bak
+
+# ==========================================
+# NODE / FRONTEND
+# ==========================================
+node_modules/
+dist/
+.next/
+.nuxt/
+
+# ==========================================
+# TEMPORARY FILES
+# ==========================================
+*.tmp
+*.swp
+*.orig
+*~
+
+# ==========================================
+# TEST / COVERAGE OUTPUT
+# ==========================================
+coverage/
