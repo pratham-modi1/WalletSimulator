@@ -22,7 +22,6 @@ public class Account {
     @Column(name = "balance", nullable = false, precision = 10, scale = 2)
     private BigDecimal balance;
 
-    // Required by JPA
     protected Account() {
     }
 
@@ -47,5 +46,9 @@ public class Account {
 
     public BigDecimal getBalance() {
         return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 }

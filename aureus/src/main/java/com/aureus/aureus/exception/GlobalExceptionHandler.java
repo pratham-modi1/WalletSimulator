@@ -10,6 +10,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -80,6 +81,32 @@ public class GlobalExceptionHandler {
     }
 
 
+    // Handles exceptions carrying an explicit HTTP status,
+// such as invalid login credentials.
+@ExceptionHandler(ResponseStatusException.class)
+public ResponseEntity<Map<String, String>> handleResponseStatusException(
+        ResponseStatusException ex) {
+
+    Map<String, String> errors = new HashMap<>();
+
+    errors.put(
+            "error",
+            ex.getStatusCode().toString()
+    );
+
+    errors.put(
+            "message",
+            ex.getReason() != null
+                    ? ex.getReason()
+                    : "Request failed"
+    );
+
+    return ResponseEntity
+            .status(ex.getStatusCode())
+            .body(errors);
+}
+
+
     // 4. Handles unexpected exceptions that do not have
     //    a more specific handler in this class.
     @ExceptionHandler(Exception.class)
@@ -99,6 +126,57 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(errors);
     }
+
+    @ExceptionHandler(InsufficientFundsException.class)
+public ResponseEntity<Map<String, String>> handleInsufficientFunds(
+        InsufficientFundsException ex) {
+
+    return ResponseEntity
+            .status(HttpStatus.UNPROCESSABLE_ENTITY)
+            .body(Map.of(
+                    "error", "Insufficient Funds",
+                    "message", ex.getMessage()
+            ));
+}
+
+
+@ExceptionHandler(IdempotencyConflictException.class)
+public ResponseEntity<Map<String, String>> handleIdempotencyConflict(
+        IdempotencyConflictException ex) {
+
+    return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(Map.of(
+                    "error", "Idempotency Conflict",
+                    "message", ex.getMessage()
+            ));
+}
+
+
+@ExceptionHandler(AccountNotFoundException.class)
+public ResponseEntity<Map<String, String>> handleAccountNotFound(
+        AccountNotFoundException ex) {
+
+    return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(Map.of(
+                    "error", "Account Not Found",
+                    "message", ex.getMessage()
+            ));
+}
+
+
+@ExceptionHandler(InvalidRequestException.class)
+public ResponseEntity<Map<String, String>> handleInvalidRequest(
+        InvalidRequestException ex) {
+
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(Map.of(
+                    "error", "Invalid Request",
+                    "message", ex.getMessage()
+            ));
+}
 }
 
 

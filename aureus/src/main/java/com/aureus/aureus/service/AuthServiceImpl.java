@@ -1,5 +1,7 @@
 package com.aureus.aureus.service;
 
+import com.aureus.aureus.dto.LoginRequest;
+import com.aureus.aureus.dto.LoginResponse;
 import com.aureus.aureus.dto.RegisterRequest;
 import com.aureus.aureus.dto.RegisterResponse;
 
@@ -22,9 +24,11 @@ import com.aureus.aureus.repository.TransactionRepository;
 import com.aureus.aureus.repository.UserRepository;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -44,19 +48,23 @@ public class AuthServiceImpl implements AuthService {
     private final TransactionRepository transactionRepository;
     private final LedgerEntryRepository ledgerEntryRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public AuthServiceImpl(
             UserRepository userRepository,
             AccountRepository accountRepository,
             TransactionRepository transactionRepository,
             LedgerEntryRepository ledgerEntryRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService) {
 
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
         this.ledgerEntryRepository = ledgerEntryRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+
     }
 
     @Override
@@ -192,4 +200,50 @@ public class AuthServiceImpl implements AuthService {
                 walletAccount.getBalance()
         );
     }
+
+
+        @Override
+        public LoginResponse login(LoginRequest request) {
+
+        String email = request.getEmail()
+                .trim()
+                .toLowerCase(Locale.ROOT);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResponseStatusException(
+                                HttpStatus.UNAUTHORIZED,
+                                "Invalid email or password"
+                        )
+                );
+
+        if (user.getUserStatus() != UserStatus.ACTIVE) {
+                throw new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Invalid email or password"
+                );
+        }
+
+        if (!passwordEncoder.matches(
+                request.getPassword(),
+                user.getPasswordHash())) {
+
+                throw new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Invalid email or password"
+                );
+        }
+
+        String token = jwtService.generateToken(
+                user.getUserId(),
+                user.getRole()
+        );
+
+        return new LoginResponse(
+                token,
+                "Bearer",
+                jwtService.getExpirationSeconds()
+        );
+
+        }
 }
