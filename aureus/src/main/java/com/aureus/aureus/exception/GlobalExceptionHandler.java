@@ -10,6 +10,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
@@ -175,6 +176,20 @@ public ResponseEntity<Map<String, String>> handleInvalidRequest(
             .body(Map.of(
                     "error", "Invalid Request",
                     "message", ex.getMessage()
+            ));
+}
+
+
+@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+public ResponseEntity<Map<String, String>> handleInvalidParameter(
+        MethodArgumentTypeMismatchException ex) {
+
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(Map.of(
+                    "error", "INVALID_PARAMETER",
+                    "message", "Invalid value for parameter '"
+                            + ex.getName() + "'"
             ));
 }
 }
